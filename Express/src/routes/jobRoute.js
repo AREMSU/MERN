@@ -1,17 +1,18 @@
 import { Router } from "express";
-import Product from "../schema/productSchema.js";
+import Job from "../schema/jobSchema.js";
 
-let productRoute = Router()
 
-productRoute
+let jobRoute = Router()
+
+jobRoute
     .route("/")
     .post(async (req, res, next) => {
 
         try {
-            let result = await Product.create(req.body) //Product.create is the main thing sending/creating the data
+            let result = await Job.create(req.body) //Product.create is the main thing sending/creating the data
             res.status(200).json({
                 success: true,
-                message: "Product created successfully.",
+                message: "Job created successfully.",
                 result: result,
             })
 
@@ -26,10 +27,10 @@ productRoute
     })
     .get(async (req, res, next) => {
     try {
-      let result = await Product.find();
+      let result = await Job.find();
       res.status(200).json({
         success: true,
-        message: "product created successfully",
+        message: "Jobs read successfully",
         result: result,
       });
     } catch (error) {
@@ -40,14 +41,14 @@ productRoute
     }
   });
 
-productRoute
+jobRoute
     .route("/:id")//localhost:8000/product/id
     .get(async(req, res, next) => {
         try{
-            let result = await Product.findById(req.params.id)
+            let result = await Job.findById(req.params.id)
             res.status(200).json({
                 success: true,
-                message: "Product read sucessfully",
+                message: "Job read sucessfully",
                 result: result,
             })
         }
@@ -60,10 +61,10 @@ productRoute
     })
     .patch(async(req, res, next) => {
          try{
-            let result = await Product.findByIdAndUpdate(req.params.id, req.body, {new:true}) //even without new:true the desired field changes but dosent immediately show in postman display iykyk
+            let result = await Job.findByIdAndUpdate(req.params.id, req.body, {new:true}) //even without new:true the desired field changes but dosent immediately show in postman display iykyk
             res.status(200).json({
                 success: true,
-                message: "Product updated sucessfully",
+                message: "Job updated sucessfully",
                 result: result,
             })
         }
@@ -76,10 +77,10 @@ productRoute
     })
     .delete(async(req, res, next) => {
         try{
-            let result = await Product.findByIdAndDelete(req.params.id)
+            let result = await Job.findByIdAndDelete(req.params.id)
             res.status(200).json({
                 success: true,
-                message: "Product deleted sucessfully",
+                message: "Job deleted sucessfully",
                 result: result,
             })
         }
@@ -91,4 +92,4 @@ productRoute
         }
     })
 
-export default productRoute
+export default jobRoute

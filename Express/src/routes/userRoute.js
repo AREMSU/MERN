@@ -1,27 +1,93 @@
 import { Router } from "express"
+import User from "../schema/userSchema.js"
 
 let userRoute = Router()
 
 userRoute
     .route("/")
-    .post((req, res, next) => {
-        res.json({ success: true, message: "user created successfully." })
+    .post(async (req, res, next) => {
+        try {
+            let result = await User.create(req.body)
+            res.status(200).json({
+                success: true,
+                message: "User created Successfully",
+                result: result,
+            })
+        }
+        catch {
+            res.status(400).json({
+                success: false,
+                message: error.message
+            })
+        }
     })
 
-    .get((req, res, next) => {
-        res.json({ sucess: true, message: "user read successfully." })
+    .get(async (req, res, next) => {
+        try {
+            let result = await User.find(req.body)
+            res.status(200).json({
+                success: true,
+                message: "Users fetched Successfully",
+                result: result,
+            })
+        }
+        catch {
+            res.status(400).json({
+                success: false,
+                message: error.message
+            })
+        }
     })
 
 userRoute
     .route("/:id")
-    .get((req, res, next) => {
-        res.json({ success: true, message: "user read successfully" })
+    .get(async (req, res, next) => {
+        try {
+            let result = await User.findById(req.params.id)
+            res.status(200).json({
+                success: true,
+                message: "User fetched successfully",
+                result: result,
+            })
+        }
+        catch {
+            res.status(400).json({
+                success: false,
+                message: error.message,
+            })
+        }
     })
-    .patch((req, res, next) => {
-        res.json({ success: true, message: "user updated successfully" })
+    .patch(async (req, res, next) => {
+        try {
+            let result = await User.findByIdAndUpdate(req.params.id, req.body, { new: true })
+            res.status(200).json({
+                success: true,
+                message: "User data updated successfully",
+                result: result,
+            })
+        }
+        catch {
+            res.status(400).json({
+                success: false,
+                message: error.message,
+            })
+        }
     })
-    .delete((req, res, next) => {
-        res.json({ success: true, message: "user deleted successfully" })
+    .delete(async (req, res, next) => {
+        try {
+            let result = await User.findByIdANdDelete(req.params.id)
+            res.status(200).json({
+                success: true,
+                message: "User deleted successfully",
+                result: result,
+            })
+        }
+        catch {
+            res.status(400).json({
+                success: false,
+                message: error.message,
+            })
+        }
     })
 
 // localhost:8000/user

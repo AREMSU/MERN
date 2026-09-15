@@ -7,6 +7,7 @@ import productRoute from "./src/routes/productRoute.js";
 import userRoute from "./src/routes/userRoute.js";
 import reviewRoute from "./src/routes/reviewRoute.js";
 import connectToDb from "./src/connectToDb.js";
+import jobRoute from "./src/routes/jobRoute.js";
 let app = express();
 
 app.listen(8000, () => {
@@ -19,6 +20,7 @@ app.use("/", firstRoute)
 app.use("/product", productRoute)
 app.use("/user", userRoute)
 app.use("/review", reviewRoute)
+app.use("/job",jobRoute)
 
 
 /* 

@@ -10,7 +10,7 @@ let userSchema = Schema({
         required: [true, "string is required."],
     },
     password: {
-        type: String,
+        type: Number,
         required: [true, "password is required."],
     },
     address: {
@@ -18,7 +18,7 @@ let userSchema = Schema({
         required: [true, "address is required."],
     },
     phone: {
-        type: String,
+        type: Number,
         required: [true, "phone is required."],
     },
 })
