@@ -1,0 +1,16 @@
+tag ma js hanna use {}
+
+react is a single page application
+
+image resides in the public folder
+
+internal css spripts tage ma hunxa
+
+external css    
+    make css file
+    import css file in main.jsx
+    use
+
+Component
+    user made tag
+    -first letter of user made tag must be capital

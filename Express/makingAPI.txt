@@ -1,0 +1,28 @@
+TO MAKE APIS
+make route --> use in main file (index.js here)
+
+
+STEPS:
+    make src
+    make a file called constant.js  ]
+    make a folder called route      ] both are same leve; 
+
+
+Error handeling:
+--> file, line, what } these are the things we need to answer when error occurs
+
+numero:
+
+uno - something is not defined -> import
+dos - can not find module -> .js missing
+
+sending body data
+get data
+dynamic params
+get params
+query
+get query
+    
+localhost:8000/a/b?price=10000&quantity=2&colour=red
+things 'before' '?' is called the route and the ones 'after' it is called 'query'
+
