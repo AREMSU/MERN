@@ -1,22 +1,51 @@
 import React, { useState } from 'react'
+import axios from "axios";
+import { toast } from 'react-toastify'
 
 const CreateProduct = () => {
-  let [name, setName] = useState("")
-  let [price, setPrice] = useState("")
-  let [quantity, setQuantity] = useState("")
-  let [description, setDescription] = useState("")
+  let [name, setName] = useState("");
+  let [price, setPrice] = useState("");
+  let [quantity, setQuantity] = useState("");
+  let [description, setDescription] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  // Add async right before the function parameter
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
     let data = {
       name: name,
       price: price,
       quantity: quantity,
       description: description,
+    };
+
+    try {
+      let result = await axios({
+        url: "http://localhost:8000/product", // Fixed URL protocol
+        method: "post", // Method should be a string
+        data: data,
+      });
+
+      console.log(result);
+
+      // Reset form on success
+      setName("");
+      setPrice("");
+      setQuantity("");
+      setDescription("");
+
+      toast.success("Product created sucessfully")
+      
+    } catch (error) {
+      toast.error(error.response.data.message)
     }
-    console.log(data)
   }
+  /* 
+  send data to backend through api
+
+  url = localhost:8000/product
+  <product>method = post
+  */
 
   return (
     <div>

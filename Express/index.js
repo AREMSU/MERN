@@ -8,6 +8,7 @@ import userRoute from "./src/routes/userRoute.js";
 import reviewRoute from "./src/routes/reviewRoute.js";
 import connectToDb from "./src/connectToDb.js";
 import jobRoute from "./src/routes/jobRoute.js";
+import cors from "cors";
 let app = express();
 
 app.listen(8000, () => {
@@ -15,6 +16,7 @@ app.listen(8000, () => {
     connectToDb()
 })
 
+app.use(cors()) //enabling cors make use hit api's through browser
 app.use(json()) //this step makes the backend capable of understanding json language
 app.use("/", firstRoute)
 app.use("/product", productRoute)

@@ -5,7 +5,7 @@ make route --> use in main file (index.js here)
 STEPS:
     make src
     make a file called constant.js  ]
-    make a folder called route      ] both are same leve; 
+    make a folder called route      ] both are same level
 
 
 Error handeling:
