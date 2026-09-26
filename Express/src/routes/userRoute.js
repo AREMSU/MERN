@@ -75,14 +75,14 @@ userRoute
     })
     .delete(async (req, res, next) => {
         try {
-            let result = await User.findByIdANdDelete(req.params.id)
+            let result = await User.findByIdAndDelete(req.params.id)
             res.status(200).json({
                 success: true,
                 message: "User deleted successfully",
                 result: result,
             })
         }
-        catch {
+        catch (error) {
             res.status(400).json({
                 success: false,
                 message: error.message,
