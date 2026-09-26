@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import axios from "axios";
+import { toast } from 'react-toastify'
 
 const CreateUser = () => {
   let [name, setName] = useState("")
@@ -7,7 +9,8 @@ const CreateUser = () => {
   let [address, setAddress] = useState("")
   let [phone, setPhone] = useState("")
 
-  const handleSubmit = (e) => {
+  // Add async right before the function parameter
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     let data = {
@@ -17,8 +20,32 @@ const CreateUser = () => {
       address: address,
       phone: phone,
     }
-    console.log(data)
+
+    try {
+      let result = await axios({
+        url: "http://localhost:8000/user", // API URL for user creation
+        method: "post", 
+        data: data,
+      });
+
+      console.log(result);
+
+      // Reset form state on success
+      setName("");
+      setEmail("");
+      setPassword("");
+      setAddress("");
+      setPhone("");
+
+      toast.success("User created successfully")
+      
+    } catch (error) {
+      // Safely check for backend error message or fallback to default
+      const errorMsg = error.response?.data?.message || "Something went wrong";
+      toast.error(errorMsg);
+    }
   }
+
   return (
     <div>
       <form onSubmit={handleSubmit}>
@@ -72,4 +99,5 @@ const CreateUser = () => {
     </div>
   )
 }
+
 export default CreateUser

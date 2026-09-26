@@ -17,11 +17,14 @@ const SunwayRoute = () => {
                 <Route path = '/product' element = {<ReadAllProduct/>}></Route>
                 <Route path = '/product/:id' element = {<ReadSingleProduct/>}></Route>
                 <Route path = '/product/update/:id' element = {<UpdateProduct/>}></Route>
+
+
                 
                 <Route path = '/user/create' element = {<CreateUser/>}></Route>
                 <Route path = '/user' element = {<ReadAllUser/>}></Route>
                 <Route path = '/user/:id' element = {<ReadSingleUser/>}></Route>
                 <Route path = '/user/update/:id' element = {<UpdateUser/>}></Route>
+
             </Routes>
         </div>
     )
