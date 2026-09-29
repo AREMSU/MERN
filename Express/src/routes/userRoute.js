@@ -1,5 +1,6 @@
 import { Router } from "express"
 import User from "../schema/userSchema.js"
+import bcrypt from "bcrypt"
 
 let userRoute = Router()
 
@@ -7,6 +8,8 @@ userRoute
     .route("/")
     .post(async (req, res, next) => {
         try {
+            req.body.password = await bcrypt.hash(req.body.password, 10)
+
             let result = await User.create(req.body)
             res.status(200).json({
                 success: true,
@@ -14,7 +17,7 @@ userRoute
                 result: result,
             })
         }
-        catch {
+        catch (error) {
             res.status(400).json({
                 success: false,
                 message: error.message

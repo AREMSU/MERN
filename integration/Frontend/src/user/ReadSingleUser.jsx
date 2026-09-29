@@ -32,10 +32,9 @@ const ReadSingleUser = () => {
         {/* Fixed: Replaced product fields with user schema properties */}
         <p><strong>User ID:</strong> {user._id}</p>
         <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Password:</strong> {user.password}</p>
         <p><strong>Address:</strong> {user.address}</p>
         <p><strong>Phone:</strong> {user.phone}</p>
-        
+
         <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
           <button onClick={() => navigate(`/user/update/${id}`)}>Edit</button>
           <button onClick={() => navigate("/user")}>Close</button>

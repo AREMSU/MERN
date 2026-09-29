@@ -10,7 +10,7 @@ let userSchema = Schema({
         required: [true, "string is required."],
     },
     password: {
-        type: Number,
+        type: String,
         required: [true, "password is required."],
     },
     address: {

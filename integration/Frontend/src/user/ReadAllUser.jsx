@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
+
 const ReadAllUser = () => {
   let [users, setUsers] = useState([]);
   let navigate = useNavigate();
@@ -49,7 +50,6 @@ const ReadAllUser = () => {
         <div key={value._id} style={{ border: "solid red 1px", marginBottom: "10px", padding: "10px" }}>
           <p>User Name: {value.name}</p>
           <p>Email: {value.email}</p>
-          <p>Password: {value.password}</p>
           <p>Address: {value.address}</p>
           <p>Phone: {value.phone}</p>
 

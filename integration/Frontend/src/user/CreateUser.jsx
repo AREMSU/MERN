@@ -70,7 +70,7 @@ const CreateUser = () => {
         <div>
           <label>Password</label>
           <input type="password"
-            onChange={(e) => {
+            onChange={async(e) => {
               setPassword(e.target.value)
             }
             }
