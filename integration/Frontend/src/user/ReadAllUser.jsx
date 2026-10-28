@@ -1,71 +1,63 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-
+import { useEffect, useState } from "react"
+import { toast } from "react-toastify"
+import api, { errMsg } from "../api"
+import { useAuth } from "../context/AuthContext"
+import { formatDate } from "../config"
 
 const ReadAllUser = () => {
-  let [users, setUsers] = useState([]);
-  let navigate = useNavigate();
+  const { user: me } = useAuth()
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  let getData = async () => {
-    try {
-      let result = await axios({
-        url: "http://localhost:8000/user",
-        method: "get",
-      });
-
-      setUsers(result.data.result);
-    } catch (error) {
-      console.error("Failed to fetch Users:", error);
-      toast.error(error.response?.data?.message || "Failed to load Users");
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
-
-    try {
-      await axios.delete(`http://localhost:8000/user/${id}`);
-      toast.success("User deleted successfully");
-      getData(); // Refresh user list instantly
-    } catch (error) {
-      console.error("Failed to delete user:", error);
-      toast.error(error.response?.data?.message || "Failed to delete user");
-    }
-  };
+  const [refresh, setRefresh] = useState(0)
 
   useEffect(() => {
-    getData();
-  }, []);
+    api.get("/user")
+      .then((res) => setUsers(res.data.result))
+      .catch((error) => toast.error(errMsg(error)))
+      .finally(() => setLoading(false))
+  }, [refresh])
+
+  const handleDelete = async (u) => {
+    if (!window.confirm(`Delete the account for ${u.email}?`)) return
+    try {
+      await api.delete(`/user/${u._id}`)
+      toast.success("User deleted")
+      setRefresh((n) => n + 1)
+    } catch (error) {
+      toast.error(errMsg(error))
+    }
+  }
+
+  if (loading) return <div className="container page muted">Loading...</div>
 
   return (
-    <div>
-      <div>
-        <button onClick={() => navigate("/user/create")} style={{ margin: "10px" }}>
-          Create
-        </button>
+    <div className="container page">
+      <h1>Users</h1>
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th></th></tr>
+          </thead>
+          <tbody>
+            {users.map((u) => (
+              <tr key={u._id}>
+                <td>{u.name}</td>
+                <td>{u.email}</td>
+                <td>{u.role}</td>
+                <td>{formatDate(u.createdAt)}</td>
+                <td className="actions">
+                  {u._id !== me._id && (
+                    <button className="link-button danger" onClick={() => handleDelete(u)}>Delete</button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-      {users.map((value) => (
-        <div key={value._id} style={{ border: "solid red 1px", marginBottom: "10px", padding: "10px" }}>
-          <p>User Name: {value.name}</p>
-          <p>Email: {value.email}</p>
-          <p>Address: {value.address}</p>
-          <p>Phone: {value.phone}</p>
-
-          <button style={{ marginRight: "10px" }} onClick={() => navigate(`/user/${value._id}`)}>
-            View Details
-          </button>
-          <button style={{ marginRight: "10px" }} onClick={() => navigate(`/user/update/${value._id}`)}>
-            Edit
-          </button>
-          <button style={{ marginRight: "10px", backgroundColor: "#ff4d4d", color: "white" }} onClick={() => handleDelete(value._id)}>
-            Remove
-          </button>
-        </div>
-      ))}
     </div>
-  );
-};
+  )
+}
 
-export default ReadAllUser;
+export default ReadAllUser

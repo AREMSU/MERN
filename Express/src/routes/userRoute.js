@@ -1,105 +1,64 @@
 import { Router } from "express"
-import User from "../schema/userSchema.js"
 import bcrypt from "bcrypt"
+import User from "../schema/userSchema.js"
+import { protect, adminOnly } from "../middleware/auth.js"
 
 let userRoute = Router()
 
+const fail = (message, status = 400) => Object.assign(new Error(message), { status })
+
+// everything here is admin only. customers sign up through /auth/register
+userRoute.use(protect, adminOnly)
+
 userRoute
     .route("/")
-    .post(async (req, res, next) => {
-        try {
-            req.body.password = await bcrypt.hash(req.body.password, 10)
-
-            let result = await User.create(req.body)
-            res.status(200).json({
-                success: true,
-                message: "User created Successfully",
-                result: result,
-            })
-        }
-        catch (error) {
-            res.status(400).json({
-                success: false,
-                message: error.message
-            })
-        }
-    })
-
-    .get(async (req, res, next) => {
-        try {
-            let result = await User.find(req.body)
-            res.status(200).json({
-                success: true,
-                message: "Users fetched Successfully",
-                result: result,
-            })
-        }
-        catch {
-            res.status(400).json({
-                success: false,
-                message: error.message
-            })
-        }
+    .get(async (req, res) => {
+        let result = await User.find().sort({ _id: -1 })
+        res.status(200).json({
+            success: true,
+            message: "Users fetched successfully",
+            result: result,
+        })
     })
 
 userRoute
     .route("/:id")
-    .get(async (req, res, next) => {
-        try {
-            let result = await User.findById(req.params.id)
-            res.status(200).json({
-                success: true,
-                message: "User fetched successfully",
-                result: result,
-            })
-        }
-        catch {
-            res.status(400).json({
-                success: false,
-                message: error.message,
-            })
-        }
+    .get(async (req, res) => {
+        let result = await User.findById(req.params.id)
+        if (!result) throw fail("User not found.", 404)
+        res.status(200).json({
+            success: true,
+            message: "User fetched successfully",
+            result: result,
+        })
     })
-    .patch(async (req, res, next) => {
-        try {
-            let result = await User.findByIdAndUpdate(req.params.id, req.body, { new: true })
-            res.status(200).json({
-                success: true,
-                message: "User data updated successfully",
-                result: result,
-            })
-        }
-        catch {
-            res.status(400).json({
-                success: false,
-                message: error.message,
-            })
-        }
-    })
-    .delete(async (req, res, next) => {
-        try {
-            let result = await User.findByIdAndDelete(req.params.id)
-            res.status(200).json({
-                success: true,
-                message: "User deleted successfully",
-                result: result,
-            })
-        }
-        catch (error) {
-            res.status(400).json({
-                success: false,
-                message: error.message,
-            })
-        }
-    })
+    .patch(async (req, res) => {
+        const { name, address, phone, role, password } = req.body
+        const updates = { name, address, phone, role }
+        Object.keys(updates).forEach((key) => updates[key] === undefined && delete updates[key])
 
-// localhost:8000/user
-// post => {sucess:true; message:'user created sucessfully'}
-// get => {sucess:true; message:'user read sucessfully'} ------> this is for all the data in the database
+        if (password) {
+            if (password.length < 6) throw fail("Password must be at least 6 characters.")
+            updates.password = await bcrypt.hash(password, 10)
+        }
 
-// localhost:8000/user/:id
-// get => {sucess:true; message:'user read sucessfully'} ------> this is for specific user in the database
-// patch => {sucess:true; message:'user updated sucessfully'}
-// delete => {sucess:true; message:'user deleted sucessfully'}
+        let result = await User.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true })
+        if (!result) throw fail("User not found.", 404)
+        res.status(200).json({
+            success: true,
+            message: "User data updated successfully",
+            result: result,
+        })
+    })
+    .delete(async (req, res) => {
+        if (req.params.id === String(req.user._id)) throw fail("You can't delete your own account.")
+        let result = await User.findByIdAndDelete(req.params.id)
+        if (!result) throw fail("User not found.", 404)
+        res.status(200).json({
+            success: true,
+            message: "User deleted successfully",
+            result: result,
+        })
+    })
 
 export default userRoute

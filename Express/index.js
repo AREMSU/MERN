@@ -2,44 +2,56 @@
 // attach port to it
 
 import express, { json } from "express";
-import firstRoute from "./src/routes/firstRoute.js";
+import cors from "cors";
+import { port, clientUrl } from "./src/constant.js";
+import connectToDb from "./src/connectToDb.js";
+import authRoute from "./src/routes/authRoute.js";
 import productRoute from "./src/routes/productRoute.js";
 import userRoute from "./src/routes/userRoute.js";
-import reviewRoute from "./src/routes/reviewRoute.js";
-import connectToDb from "./src/connectToDb.js";
-import jobRoute from "./src/routes/jobRoute.js";
-import cors from "cors";
-let app = express();
+import orderRoute from "./src/routes/orderRoute.js";
 
-app.listen(8000, () => {
-    console.log("application is listening at port 8000")
-    connectToDb()
-})
+let app = express()
 
-app.use(cors()) //enabling cors make use hit api's through browser
+app.use(cors({ origin: clientUrl })) //only the frontend is allowed to call the api from a browser
 app.use(json()) //this step makes the backend capable of understanding json language
-app.use("/", firstRoute)
+
+app.get("/", (req, res) => {
+    res.json({ success: true, message: "api is running" })
+})
+app.use("/auth", authRoute)
 app.use("/product", productRoute)
 app.use("/user", userRoute)
-app.use("/review", reviewRoute)
-app.use("/job",jobRoute)
+app.use("/order", orderRoute)
 
+// unknown url
+app.use((req, res) => {
+    res.status(404).json({ success: false, message: "Route not found." })
+})
 
-/* 
-database actions
+// every error thrown in a route ends up here (express 5 forwards async errors automatically)
+app.use((error, req, res, next) => {
+    let status = error.status || 500
+    let message = error.message
 
-C => Create    (post)
-R => Read      (get)
-U => Update    (put/ patch, mostly patch is used)
-D => Delete    (delete)
+    if (error.name === "ValidationError") status = 400
+    if (error.name === "CastError") {
+        status = 400
+        message = "Invalid id."
+    }
+    if (error.code === 11000) {
+        status = 400
+        message = `${Object.keys(error.keyValue || {})[0] || "value"} already exists.`
+    }
 
-making api means defining output for each request
+    if (status === 500) {
+        console.error(error)
+        message = "Something went wrong on the server."
+    }
 
-localhost: 8000, post => i am post method
-localhost: 8000, get => i am get method
-localhost: 8000, patch => i am patch method
-localhost: 8000, delete => i am delete method
+    res.status(status).json({ success: false, message: message })
+})
 
-database (mongodb database)
-
-*/
+await connectToDb()
+app.listen(port, () => {
+    console.log(`application is listening at port ${port}`)
+})

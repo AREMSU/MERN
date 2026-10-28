@@ -1,46 +1,73 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react"
+import { Link, useNavigate, useParams } from "react-router-dom"
+import { toast } from "react-toastify"
+import api, { errMsg } from "../api"
+import { useAuth } from "../context/AuthContext"
+import { useCart } from "../context/CartContext"
+import { money } from "../config"
 
 const ReadSingleProduct = () => {
-  const [product, setProduct] = useState({});
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const { user } = useAuth()
+  const { add } = useCart()
+  const [product, setProduct] = useState(null)
+  const [qty, setQty] = useState(1)
 
   useEffect(() => {
-    const getProduct = async () => {
-      try {
-        const res = await axios.get(`http://localhost:8000/product/${id}`);
-        setProduct(res.data.result);
-      } catch (err) {
-        toast.error("Failed to load product details");
-      }
-    };
-    getProduct();
-  }, [id]);
+    api.get(`/product/${id}`)
+      .then((res) => setProduct(res.data.result))
+      .catch((error) => {
+        toast.error(errMsg(error))
+        navigate("/product")
+      })
+  }, [id, navigate])
+
+  if (!product) return <div className="container page muted">Loading...</div>
+
+  const inStock = product.quantity > 0
+
+  const handleAdd = () => {
+    add(product, qty)
+    toast.success(`${product.name} added to cart`)
+  }
 
   return (
-    <div style={{ padding: "20px", maxWidth: "600px" }}>
-      <button onClick={() => navigate("/product")} style={{ marginBottom: "15px" }}>
-        ← Back to Products
-      </button>
+    <div className="container page">
+      <p><Link to="/product">Back to shop</Link></p>
+      <div className="detail">
+        <div className="detail-image">
+          {product.image ? <img src={product.image} alt={product.name} /> : <span>{product.name.charAt(0)}</span>}
+        </div>
+        <div>
+          <div className="small muted">{product.category}</div>
+          <h1>{product.name}</h1>
+          <p className="price">{money(product.price)}</p>
+          <p>{product.description}</p>
+          <p className="muted">{inStock ? `${product.quantity} in stock` : "Out of stock"}</p>
 
-      <div style={{ border: "1px solid #ccc", padding: "20px", borderRadius: "8px" }}>
-        <h2>{product.name}</h2>
-        <hr />
-        <p><strong>Product ID:</strong> {product._id}</p>
-        <p><strong>Price:</strong> Rs.{product.price}</p>
-        <p><strong>Quantity:</strong> {product.quantity} units</p>
-        <p><strong>Description:</strong> {product.description}</p>
-        
-        <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
-          <button onClick={() => navigate(`/product/update/${id}`)}>Edit</button>
-          <button onClick={() => navigate("/product")}>Close</button>
+          {inStock && (
+            <div className="row">
+              <input
+                type="number"
+                min="1"
+                max={product.quantity}
+                value={qty}
+                onChange={(e) => setQty(Math.max(1, Math.min(Number(e.target.value) || 1, product.quantity)))}
+                className="qty"
+                aria-label="Quantity"
+              />
+              <button className="btn" onClick={handleAdd}>Add to cart</button>
+            </div>
+          )}
+
+          {user?.role === "admin" && (
+            <p><Link to={`/admin/product/update/${product._id}`}>Edit this product</Link></p>
+          )}
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ReadSingleProduct;
+export default ReadSingleProduct
