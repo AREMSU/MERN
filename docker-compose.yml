@@ -1,0 +1,43 @@
+services:
+  # containers to be run
+
+  mongo:
+    image: mongo:7
+    # official MongoDB image, pulled as it is
+    container_name: shop-mongo
+    volumes:
+      - mongo-data:/data/db
+    # named volume, so products and orders survive "docker compose down"
+    restart: unless-stopped
+
+  backend:
+    build: ./Express
+    # builds the image from Express/Dockerfile
+    image: shop-backend
+    container_name: shop-backend
+    environment:
+      - PORT=8000
+      - DB_URL=mongodb://mongo:27017/shop
+      # "mongo" is the service name above, Docker's internal DNS resolves it to that container
+      - JWT_SECRET=${JWT_SECRET:?set JWT_SECRET in the .env file}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@store.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    # no "ports:" here, the backend is only reachable from other containers (through nginx)
+
+  frontend:
+    build: ./integration/Frontend
+    # multi-stage build: Node builds React, nginx serves it
+    image: shop-frontend
+    container_name: shop-frontend
+    ports:
+      - "8080:80"
+    # the only service published to the host: http://localhost:8080
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mongo-data:

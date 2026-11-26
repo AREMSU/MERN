@@ -55,3 +55,14 @@ await connectToDb()
 app.listen(port, () => {
     console.log(`application is listening at port ${port}`)
 })
+
+await connectToDb()
+
+// on Vercel the platform runs the app itself
+if (!process.env.VERCEL) {
+    app.listen(port, () => {
+        console.log(`application is listening at port ${port}`)
+    })
+}
+
+export default app
