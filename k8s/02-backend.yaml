@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: YOUR_DOCKERHUB_USERNAME/shop-backend:v1
+          image: aremsu/shop-backend:v1
           ports:
             - containerPort: 8000
           env:
