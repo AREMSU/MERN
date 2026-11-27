@@ -3,8 +3,8 @@
 ## Deploy
 1. Make sure the secrets from `01-setup-github-secrets.md` exist (lab accounts: fresh AWS values).
 2. Push to `main`, or run the workflow by hand: Actions > CI/CD > Run workflow.
-3. Watch the Actions tab. `build` checks the code and pushes the images to Docker Hub.
-   `deploy` creates the server the first time (about 2-3 minutes), then starts the containers.
+3. Watch the Actions tab. `build` checks the code. `deploy` creates the server the first time (about 2-3 minutes),
+   copies the code to it and builds and starts the containers there (the first build takes a few minutes).
 4. The last step prints `site is live: http://<ip>`. Open that address.
    The admin login is the `ADMIN_EMAIL` and `ADMIN_PASSWORD` you set in the secrets.
 
@@ -37,4 +37,4 @@ This deletes the server and the database data on it.
 | `waiting for the server` never ends | Check the instance in the EC2 console. UserData logs: `/var/log/cloud-init-output.log`. |
 | Site opens but the page is empty or errors | `docker compose logs backend` on the server. |
 | IP changed after a lab restart | Re-run the workflow. The new address is printed at the end. |
-| `denied` pulling images | Make `shop-backend` and `shop-frontend` public on Docker Hub. |
+| Build on the server is killed or very slow | The instance ran out of memory. Set `InstanceType` to `t3.small` in `infra/ec2-instance.yaml` and re-run. |

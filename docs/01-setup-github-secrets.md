@@ -6,8 +6,6 @@ Never commit any of these values.
 
 | Secret | Value |
 |---|---|
-| `DOCKERHUB_USERNAME` | your Docker Hub username (`aremsu`) |
-| `DOCKERHUB_TOKEN` | a Docker Hub access token (Account Settings > Personal access tokens, Read & Write) |
 | `JWT_SECRET` | output of `openssl rand -hex 32` |
 | `ADMIN_EMAIL` | the shop admin email, for example `admin@store.com` |
 | `ADMIN_PASSWORD` | the shop admin password |

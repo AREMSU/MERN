@@ -1,5 +1,5 @@
-# used on the EC2 server. images come from Docker Hub, built by the pipeline.
-# DOCKERHUB_USER, IMAGE_TAG, JWT_SECRET, ADMIN_* are written into .env by the pipeline.
+# used on the EC2 server. the images are built on the server from the copied source,
+# JWT_SECRET and ADMIN_* are written into .env by the pipeline.
 services:
   mongo:
     image: mongo:7
@@ -9,7 +9,8 @@ services:
     restart: unless-stopped
 
   backend:
-    image: ${DOCKERHUB_USER}/shop-backend:${IMAGE_TAG:-latest}
+    build: ./Express
+    image: shop-backend
     container_name: shop-backend
     environment:
       - PORT=8000
@@ -22,7 +23,8 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: ${DOCKERHUB_USER}/shop-frontend:${IMAGE_TAG:-latest}
+    build: ./integration/Frontend
+    image: shop-frontend
     container_name: shop-frontend
     ports:
       - "80:80"
